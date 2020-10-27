@@ -1,0 +1,31 @@
+h2{
+    text-align: center;   
+}
+h1{
+    margin: auto;
+    width: 360px;
+}
+h2{
+    border: orangered;
+}
+.form{ 
+       width: 50%;
+       opacity:0.8;
+       border-radius: 10px;
+       height:20px;
+       padding:6px 12px;
+       font-size:14px;
+       line-height:1.42857143;
+ }
+ .button{ border-radius: 5px;
+          height: 30px;
+          padding:6px 12px;
+          line-height:1.42857143;
+          width: 77px;
+        }
+textarea{
+    width: 40%;
+    margin-top: 10px;
+    margin-bottom: -10px;
+}
+

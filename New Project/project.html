@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="project.css" />
+    <link rel="stylesheet" href="">
+    <title>Infix To Postfix Convertor</title>
+   <style>
+        body{
+            background-image: url('bg6.jpg');            
+            position:absolute;
+            top:0;
+            bottom:0;
+            right:0;
+            left:0;
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index:-1;
+            }
+    </style>
+     <!-- Algorithm:
+     Whenever an integer/character comes from expression we append to postfix String
+     Whenever a operator comes in we check the precedence of the incoming operator with the 
+     operator on the top of the stack if the stack is not null
+     If the precedence of the incoming operator is lower than or equal to operator on the top of
+     the stack - Pop the operator on the stack and check the precedence again until the operator
+     is greater than that of the operator on the stack (except if operator is '^' which has the highest precedence and 
+     is right associative)
+     Append the popped operator to the postFix string
+     If there are no expressions left in the stack pop all the operators and append to the string  -->
+    <script type="text/javascript">function isOperator(c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    }
+    
+    function leftAssoc(c) {
+        return c != '^';
+    }
+    
+    function priority(c) {
+        if (c == '^') return 3;
+        if (c == '*') return 2;
+        if (c == '/') return 2;
+        if (c == '+') return 1;
+        if (c == '-') return 1;
+        return 0;
+    }
+    
+    function rightPriority(c) {
+        if (c == '+') return 1;
+        if (c == '-') return 2;
+        if (c == '*') return 3;
+        if (c == '/') return 4;
+        if (c == '^') return 5;
+        return 0;
+    }
+    
+    function infixToPostfix(expr) {
+    
+        var i = 0;
+        if (typeof expr !== 'string') {
+            if (expr instanceof String) {
+                expr = expr.toString();
+            }else {
+             return 'Invalid expression.';
+            }
+        }
+    
+       var tokens = expr.replace(/^-|([\^\(+\-*/])\s*-/g, "$1#")
+                      .match(/([\#?\.\w]+)|[\^()+\-*/]/gi)
+                      .map(e => e.replace("#", "-"));
+    
+        var S = [], O = [], tok;
+    
+        while (tok = tokens.shift()) {
+            if (tok == '(') S.push(tok);
+            else if (tok == ')') {
+                while (S.length > 0 && S[S.length - 1] != '(') O.push(S.pop());
+                if (S.length == 0) return 'Mismatched parenthesis.';
+                S.pop();
+            } else if (isOperator(tok)) {
+                while (S.length > 0 && isOperator(S[S.length - 1]) && ((leftAssoc(tok) && priority(tok) <= priority(S[S.length - 1])) || (!leftAssoc(tok) && priority(tok) < priority(S[S.length - 1])))) O.push(S.pop());
+                S.push(tok);
+            } else {
+                O.push(tok);
+            }
+        }
+    
+        while (S.length > 0) {
+            if (!isOperator(S[S.length - 1])) return 'Mismatched parenthesis.';
+            O.push(S.pop());
+        }
+    
+        if (O.length == 0) return 'Invalid expression.'
+    
+        var s = '';
+        for (var i = 0; i < O.length; i++) {
+            if (i != 0) s += ' ';
+            s += O[i];
+        }
+    
+        return s;
+    }
+    
+    function postfixToInfix(expr) {
+    
+        var i = 0;
+        var nextToken = function() {
+                while (i < expr.length && expr[i] == ' ') i++;
+                if (i == expr.length) return '';
+                var b = '';
+                while (i < expr.length && expr[i] != ' ') b += expr[i++];
+                return b;
+            };
+        var print = function(x) {
+                if (typeof(x) == 'string') return x;
+    
+             
+                var l = print(x.l),
+                    r = print(x.r);
+    
+                if (typeof(x.l) != 'string' && (priority(x.l.op) < priority(x.op) || (x.l.op == x.op && x.op == '^')))
+                    l = '(' + l + ')';
+    
+                if (typeof(x.r) != 'string' && (rightPriority(x.r.op) <= rightPriority(x.op) || (x.l.op == x.op && (x.op == '-' || x.op == '/'))))
+                    r = '(' + r + ')';
+    
+                return l + ' ' + x.op + ' ' + r;
+            };
+    
+        var S = [], tok;
+        while ((tok = nextToken(expr)) != '') {
+            if (isOperator(tok)) {
+                if (S.length < 2) return 'Invalid expression.';
+                S.push({ op: tok, r: S.pop(), l: S.pop() });
+            } else {
+                S.push(tok);
+            }
+        }
+    
+        if (S.length != 1) return 'Invalid expression.';
+        return print(S.pop());
+    }</script>        
+</head>
+<body>
+<div class="bg_img">
+    <div>
+        <h1>Infix to postfix Convertor-"By Varrnit Jaiswal"</h1>
+        <h2>It helps you to change between infix and post fix and postfix to Infix.The converter supports +.-.*. / and ^.</h2>
+        <h2>Enter Your Expression.</h2>
+        <form method="post" name="form1" align="center"onsubmit="if (this.submitted){return true;} else {form1.postfix.value=infixToPostfix(form1.infix.value); return false; }">
+        <h2>Infix to postfix:</h2>
+        <p><input class="form" name="infix" type="text" value="">
+        <br><input class="button" type="submit" value="Convert" onclick="form1.postfix.value = infixToPostfix(form1.infix.value);">
+        <textarea style="opacity:1; border-radius: 10px;" name="postfix"></textarea></p>
+        </form>
+        <div class='code-block code-block-4' style='margin: 8px 0; clear: both;'>             
+        <form method="post" name="form2" align="center"onsubmit="if (this.submitted){return true;} else {form2.infix.value = postfixToInfix(form2.postfix.value); return false; }">
+        <h2>Postfix to infix:</h2>
+        <p><input class="form" name="postfix" type="text" value=""><br>
+        <input class="button" type="submit" value="Convert" onclick="form2.infix.value = postfixToInfix(form2.postfix.value);">
+        <textarea style="opacity:1; border-radius: 10px;" name="infix"></textarea><br />
+        </form>
+    </div>
+</div>
+</body>
+</html>
